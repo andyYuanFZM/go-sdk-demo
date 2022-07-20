@@ -10,6 +10,7 @@
 demo目录  
 - commont_test.go：包含一些常用的方法（区块链地址和私钥的生成; 获取最大区块高度; 根据区块高度获取区块详情信息）  
 - main.go: 通过go-sdk部署，运行和查询evm合约（ERC1155）的方法  
+
 solidity目录  
 - ERC1155ByManager.sol: ERC1155发行NFT,转移NFT的合约样例。  
 - ERC721ByManager.sol: ERC721发行NFT,转移NFT的合约样例。  
