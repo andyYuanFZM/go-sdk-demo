@@ -23,7 +23,7 @@ func TestCreateAccountEth(t *testing.T) {
 
 // 获取当前最大区块高度
 func TestGetLastHeader(t *testing.T) {
-	url := "http://172.22.16.179:8921"
+	url := "http://122.224.77.188:8991"
 	client, _ := c.NewJSONClient("", url)
 	header, _ := client.GetLastHeader()
 	fmt.Println("当前最大区块高度为:", header.Height)
@@ -31,7 +31,7 @@ func TestGetLastHeader(t *testing.T) {
 
 // 根据区块高度获取区块信息
 func TestGetBlocks(t *testing.T) {
-	url := "http://172.22.16.179:8921"
+	url := "http://122.224.77.188:8991"
 	client, _ := c.NewJSONClient("", url)
 	blocks, _ := client.GetBlocks(10, 12, true)
 	for i := 0; i < len(blocks.Items); i++ {

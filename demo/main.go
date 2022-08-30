@@ -15,36 +15,37 @@ import (
 var (
 	// BTC类型地址
 	// 合约部署人的地址和私钥
-	//deployAddress    = "14KEKbYtKKQm4wMthSK9J4La4nAiidGozt"
-	//deployPrivateKey = "CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"
+	deployAddress    = "14KEKbYtKKQm4wMthSK9J4La4nAiidGozt"
+	deployPrivateKey = "CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"
 	// 代扣手续费的地址和私钥
-	//withholdAddress    = "14KEKbYtKKQm4wMthSK9J4La4nAiidGozt"
-	//withholdPrivateKey = "CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"
+	withholdAddress    = "14KEKbYtKKQm4wMthSK9J4La4nAiidGozt"
+	withholdPrivateKey = "CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"
 	// 用户地址
-	//useraAddress    = "17RH6oiMbUjat3AAyQeifNiACPFefvz3Au"
-	//useraPrivateKey = "56d1272fcf806c3c5105f3536e39c8b33f88cb8971011dfe5886159201884763"
-	//
-	//url       = "http://172.22.16.179:8901"
-	//paraName  = "user.p.mbaas."
+	useraAddress    = "17RH6oiMbUjat3AAyQeifNiACPFefvz3Au"
+	useraPrivateKey = "56d1272fcf806c3c5105f3536e39c8b33f88cb8971011dfe5886159201884763"
+
+	url       = "http://172.22.16.179:8901"
+	paraName  = "user.p.mbaas."
 	// 普通地址类型（BTC形式）
-	//addressID = NormalAddressID
-	//chainID = 999
+	addressID = NormalAddressID
+	chainID = 0
 
 	// ETH类型地址
-	deployAddress    = "0x2112a4f44544e63d434cbfee5bbd6f942a5a42dd"
-	deployPrivateKey = "0x42c87f281b2cd101a5dc54b85fa6b753579be3f5770f1cf9b166188bf0c41b72"
-
-	withholdAddress    = "0x2112a4f44544e63d434cbfee5bbd6f942a5a42dd"
-	withholdPrivateKey = "0x42c87f281b2cd101a5dc54b85fa6b753579be3f5770f1cf9b166188bf0c41b72"
-
-	useraAddress    = "0x6856f610b40e7321cace9e1f8752315110862573"
-	useraPrivateKey = "0x3967abcafaea83fee72766ca6dae578f4f156b5d1dae1ddf119e4564d5e2658c"
-
-	url       = "http://172.22.16.179:8921"
-	paraName  = "user.p.parademo."
-	// 以太坊类型地址
-	addressID = ETHAddressID
-	chainID   = 999
+	// 合约部署人的地址和私钥
+	//deployAddress    = "0x4cb94044427edb06ae7aeb8e8dd6eba078c8bc0a"
+	//deployPrivateKey = "7dfe80684f7007b2829a28c85be681304f7f4cf6081303dbace925826e2891d1"
+	//// 代扣手续费的地址和私钥
+	//withholdAddress    = "0xfd89c32962f19bcea69b76093a64a03618cb33be"
+	//withholdPrivateKey = "56d1272fcf806c3c5105f3536e39c8b33f88cb8971011dfe5886159201884763"
+	//// 用户地址
+	//useraAddress    = "0x6856f610b40e7321cace9e1f8752315110862573"
+	//useraPrivateKey = "0x3967abcafaea83fee72766ca6dae578f4f156b5d1dae1ddf119e4564d5e2658c"
+	//
+	//url       = "http://122.224.77.188:8991"
+	//paraName  = "user.p.para_pressuretest_2."
+	//// 以太坊类型地址
+	//addressID = ETHAddressID
+	//chainID   = 999
 )
 
 func main() {
