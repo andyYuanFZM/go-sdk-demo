@@ -20,9 +20,12 @@ var (
 	// 代扣手续费的地址和私钥
 	withholdAddress    = "14KEKbYtKKQm4wMthSK9J4La4nAiidGozt"
 	withholdPrivateKey = "CC38546E9E659D15E6B4893F0AB32A06D103931A8230B0BDE71459D2B27D6944"
-	// 用户地址
+	// 用户A地址
 	useraAddress    = "17RH6oiMbUjat3AAyQeifNiACPFefvz3Au"
 	useraPrivateKey = "56d1272fcf806c3c5105f3536e39c8b33f88cb8971011dfe5886159201884763"
+	// 用户B地址
+	userbAddress    = "1MhMAeA1dwcb6ufjXZ5vun5PcjS1fi5xzb"
+	userbPrivateKey = "44203242131538fb2495303e44edd08668d2abd88d9ace577b8fe9615cd6144c"
 
 	url       = "http://172.22.16.179:8901"
 	paraName  = "user.p.mbaas."
@@ -60,9 +63,9 @@ func main() {
 	unsignTx := types.ToHex(types.Encode(tx))
 	gas, err := evm.QueryEvmGas(url, unsignTx, deployAddress)
 
-	fmt.Println("gas fee = ", gas)
+	fmt.Print("部署合约交易的gas fee = ", gas)
 	fee := evm.GetProperFee(url)
-	fmt.Println("proper fee = ", fee)
+	fmt.Println("; 部署合约交易的proper fee = ", fee)
 	evm.UpdateTxFee(tx, gas, fee)
 	err = crypto.SignTx(tx, deployPrivateKey, int32(addressID))
 
@@ -70,14 +73,22 @@ func main() {
 	txhash, err := jsonclient.SendTransaction(signTx)
 
 	fmt.Print("部署合约交易hash = ", txhash)
-	time.Sleep(8 * time.Second)
+	time.Sleep(10 * time.Second)
+	for i := 0; i < 10; i++ {
+		detail, _ := jsonclient.QueryTransaction(txhash)
+		if (nil == detail) {
+			time.Sleep(3 * time.Second)
+			continue
+		}
+		break
+	}
 	detail, err := jsonclient.QueryTransaction(txhash)
 
-	fmt.Println("; 部署合约交易执行结果（结果码=2代表成功） = ", detail.Receipt.Ty)
+	fmt.Print("; 部署合约交易执行结果（结果码=2代表成功） = ", detail.Receipt.Ty)
 
 	// 计算合约地址
 	contractAddress := evm.GetContractAddr(deployAddress, strings.TrimPrefix(txhash, "0x"), url)
-	fmt.Println("部署好的合约地址 = " + contractAddress)
+	fmt.Println("; 部署好的合约地址 = " + contractAddress)
 
 	length := 2
 	// tokenId数组
@@ -96,7 +107,7 @@ func main() {
 	amountStr, _ := json.Marshal(amounts)
 	uriStr, _ := json.Marshal(uris)
 
-	// 调用合约
+	// ============================= 发行NFT 调用合约 mint方法 ====================================
 	param := fmt.Sprintf("mint(%s,%s,%s,%s)", useraAddress, idStr, amountStr, uriStr)
 	initNFT, err := evm.EncodeParameter(ABI_1155, param)
 
@@ -104,9 +115,9 @@ func main() {
 	unsignTx = types.ToHex(types.Encode(tx))
 	gas, err = evm.QueryEvmGas(url, unsignTx, deployAddress)
 
-	fmt.Println("gas fee = ", gas)
+	fmt.Print("发行NFT交易的gas fee = ", gas)
 	fee = evm.GetProperFee(url)
-	fmt.Println("proper fee = ", fee)
+	fmt.Println("; 发行NFT交易的proper fee = ", fee)
 	evm.UpdateTxFee(tx, gas, fee)
 	// 构造交易组, deployPrivateKey:用于签名部署合约的交易， withholdPrivateKey：用于签名代扣交易
 	group, err := evm.CreateNobalance(tx, deployPrivateKey, withholdPrivateKey, paraName, int32(addressID), int32(chainID))
@@ -114,23 +125,76 @@ func main() {
 	signTx = types.ToHexPrefix(types.Encode(group.Tx()))
 	txhash, err = jsonclient.SendTransaction(signTx)
 
-	fmt.Print("代扣交易hash = ", txhash)
-	time.Sleep(8 * time.Second)
+	fmt.Print("发行NFT交易代扣hash = ", txhash)
+	time.Sleep(10 * time.Second)
+	for i := 0; i < 10; i++ {
+		detail, _ := jsonclient.QueryTransaction(txhash)
+		if (nil == detail) {
+			time.Sleep(3 * time.Second)
+			continue
+		}
+		break
+	}
 	detail, err = jsonclient.QueryTransaction(txhash)
 	// 从交易组中取出EVM交易的hash值
 	nextHash := detail.Tx.Next
-	fmt.Println("; EVM交易hash = ", nextHash)
+	fmt.Print("; 发行NFT交易hash = ", nextHash)
+
+	detail, err = jsonclient.QueryTransaction(nextHash)
+	fmt.Println("; 发行NFT交易执行结果（结果码=2代表成功） = ", detail.Receipt.Ty)
+
+
+	// ============================= 转让NFT A用户转给B用户 调用合约 transferArtNFT方法 ====================================
+	// 转让NFT的tokenid
+	tokenid, _ := json.Marshal(ids[0])
+	// 转让的数量
+	amount,_:= json.Marshal(2)
+	param = fmt.Sprintf("transferArtNFT(%s,%s,%s)", userbAddress, tokenid, amount)
+	transferNFT, err := evm.EncodeParameter(ABI_1155, param)
+
+	tx, err = evm.CallEvmContract(transferNFT, "", 0, contractAddress, paraName, int32(addressID), int32(chainID))
+	unsignTx = types.ToHex(types.Encode(tx))
+	gas, err = evm.QueryEvmGas(url, unsignTx, useraAddress)
+
+	fmt.Print("转让NFT交易的gas fee = ", gas)
+	fee = evm.GetProperFee(url)
+	fmt.Println("; 转让NFT交易的proper fee = ", fee)
+	evm.UpdateTxFee(tx, gas, fee)
+	// 构造交易组, useraPrivateKey:用于签名转让NFT交易（A用户转出，用A用户私钥签名）， withholdPrivateKey：用于签名代扣交易
+	group, err = evm.CreateNobalance(tx, useraPrivateKey, withholdPrivateKey, paraName, int32(addressID), int32(chainID))
+
+	signTx = types.ToHexPrefix(types.Encode(group.Tx()))
+	txhash, err = jsonclient.SendTransaction(signTx)
+
+	fmt.Print("转让NFT交易代扣hash = ", txhash)
+	time.Sleep(10 * time.Second)
+	for i := 0; i < 10; i++ {
+		detail, _ := jsonclient.QueryTransaction(txhash)
+		if (nil == detail) {
+			time.Sleep(3 * time.Second)
+			continue
+		}
+		break
+	}
+	detail, err = jsonclient.QueryTransaction(txhash)
+	// 从交易组中取出EVM交易的hash值
+	nextHash = detail.Tx.Next
+	fmt.Print("; 转让NFT交易hash = ", nextHash)
 
 	detail, err = jsonclient.QueryTransaction(nextHash)
 	fmt.Println("; EVM交易执行结果（结果码=2代表成功） = ", detail.Receipt.Ty)
 
-	// 合约查询
+	// 合约查询,用户A的余额查询
 	param = fmt.Sprintf("balanceOf(%s,%d)", useraAddress, ids[0])
 	balance, err := evm.QueryContract(url, contractAddress, ABI_1155, param, contractAddress)
-
 	fmt.Println(param, " = ", balance[0])
+
 	param = fmt.Sprintf("uri(%d)", ids[1])
 	uri, err := evm.QueryContract(url, contractAddress, ABI_1155, param, contractAddress)
-
 	fmt.Println(param, " = ", uri[0])
+
+	// 合约查询,用户B的余额查询
+	param = fmt.Sprintf("balanceOf(%s,%d)", userbAddress, ids[0])
+	balance, err = evm.QueryContract(url, contractAddress, ABI_1155, param, contractAddress)
+	fmt.Println(param, " = ", balance[0])
 }
